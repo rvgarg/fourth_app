@@ -33,7 +33,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   TextEditingController _email = TextEditingController(),
       _password = TextEditingController();
-  var _key = GlobalKey<FormState>();
+  final _key = GlobalKey<FormState>();
   var gotData = false;
   late Future<User?> _user;
 
@@ -54,56 +54,62 @@ class _MyHomePageState extends State<MyHomePage> {
                           children: [
                             TextFormField(
                               controller: _email,
-                              validator: (value) =>
-                                  value == '' || !value!.contains('@')
-                                      ? 'Email is required'
-                                      : null,
+                              validator: (value) {
+                                if (value == null ||
+                                    value.isEmpty ||
+                                    !(value.contains('@')) ||
+                                    !(value.contains('.com')))
+                                  return 'Email is required';
+                                return null;
+                              },
                               keyboardType: TextInputType.emailAddress,
                               decoration: InputDecoration(labelText: 'Email'),
                             ),
                             TextFormField(
                               controller: _password,
-                              validator: (value) => value == null || value == ''
-                                  ? 'Password is required'
-                                  : null,
+                              validator: (value) {
+                                return value == null || value.isEmpty
+                                    ? 'Password is required'
+                                    : null;
+                              },
                               keyboardType: TextInputType.text,
                               obscureText: true,
                               decoration:
                                   InputDecoration(labelText: 'Password'),
                             ),
+                            Align(
+                                alignment: Alignment.bottomCenter,
+                                child: OutlinedButton(
+                                    onPressed: () {
+                                      if (_key.currentState!.validate()) {
+                                        _user = ApiService().login(
+                                            _email.text.toString(),
+                                            _password.text.toString());
+                                        setState(() {
+                                          gotData = true;
+                                        });
+                                      }
+                                    },
+                                    child: Text('SUBMIT'))),
                           ],
                         ),
                       )),
-                  Align(
-                      alignment: Alignment.bottomCenter,
-                      child: OutlinedButton(
-                          onPressed: () {
-                            setState(() {
-                              _key.currentState!.validate();
-                              _user = ApiService().login(_email.text.toString(),
-                                  _password.text.toString());
-                              gotData = true;
-                            });
-                          },
-                          child: Text('SUBMIT'))),
-                  Align(alignment: Alignment.center,child: OutlinedButton(child: Text('LOGIN'),onPressed: () {
-                    setState(() {
-                      ApiService().login();
-                    });
-                  },),)
-
                 ],
               )
             : FutureBuilder<User?>(
                 future: _user,
                 builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
-                  print("Snapshot data: ${snapshot.data.toString()}");
+                  // print("Snapshot data: ${snapshot.data.toString()}");
+                  // print(
+                  //     '${snapshot.data!.img.toString().replaceAll(RegExp(r'\\'), '')}');
                   return snapshot.data != null
                       ? Stack(
                           children: [
                             Row(
                               children: [
-                                Image.network(snapshot.data!.img.toString()),
+                                Image.network(snapshot.data!.img
+                                    .toString()
+                                    .replaceAll(RegExp(r'\\'), '')),
                                 Padding(
                                   padding: EdgeInsets.all(15),
                                   child:
