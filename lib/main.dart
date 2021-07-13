@@ -100,16 +100,16 @@ class _MyHomePageState extends State<MyHomePage> {
                 future: _user,
                 builder: (BuildContext context, AsyncSnapshot<User?> snapshot) {
                   // print("Snapshot data: ${snapshot.data.toString()}");
-                  // print(
-                  //     '${snapshot.data!.img.toString().replaceAll(RegExp(r'\\'), '')}');
+                  if (snapshot.data != null)
+                    print(
+                        '${snapshot.data!.img.toString().replaceAll(RegExp(r'\\'), '')}');
                   return snapshot.data != null
-                      ? Stack(
+                      ? Column(
                           children: [
                             Row(
                               children: [
-                                Image.network(snapshot.data!.img
-                                    .toString()
-                                    .replaceAll(RegExp(r'\\'), '')),
+                                new Image.network(
+                                    '${snapshot.data!.img.toString()}'),
                                 Padding(
                                   padding: EdgeInsets.all(15),
                                   child:
